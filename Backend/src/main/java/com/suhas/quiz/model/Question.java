@@ -15,6 +15,10 @@ public class Question {
     @Column(nullable = false, length = 2000)
     private String questionText;
 
+    public int getCorrectAnswerIndex() {
+        return correctAnswerIndex;
+    }
+
     @ElementCollection
     @CollectionTable(name = "question_options",
             joinColumns = @JoinColumn(name = "question_id"))
@@ -24,6 +28,14 @@ public class Question {
     @Column(nullable = false)
     private int correctAnswerIndex;
 
+    public Topic getTopic() {
+        return topic;
+    }
+
+    public List<String> getOptions() {
+        return options;
+    }
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "topic_id", nullable = false)
     private Topic topic;
@@ -31,6 +43,14 @@ public class Question {
     private LocalDateTime createdAt = LocalDateTime.now();
 
     public Question() {}
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getQuestionText() {
+        return questionText;
+    }
 
     public Question(String questionText,
                     List<String> options,
