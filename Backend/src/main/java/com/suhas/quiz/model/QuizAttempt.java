@@ -51,5 +51,24 @@ public class QuizAttempt {
         }
     }
     // getters
+    public Topic getTopic() {
+        return topic;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public int getTotalQuestions() {
+        return totalQuestions;
+    }
+
+    public double getPercentage() {
+        return percentage;
+    }
+
+    public LocalDateTime getAttemptedAt() {
+        return attemptedAt;
+    }
 
 }

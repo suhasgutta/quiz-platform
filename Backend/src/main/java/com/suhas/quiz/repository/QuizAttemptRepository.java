@@ -23,4 +23,6 @@ ORDER BY qa.percentage DESC
     List<LeaderboardResponse> getLeaderboard(Long topicId);
 
     Optional<QuizAttempt> findByUserIdAndTopicId(Long userId, Long topicId);
+
+    List<QuizAttempt> findByUserIdOrderByAttemptedAtDesc(Long userId);
 }

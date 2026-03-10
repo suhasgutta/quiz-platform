@@ -1,12 +1,10 @@
 package com.suhas.quiz.controller;
 
-import com.suhas.quiz.dto.LeaderboardResponse;
-import com.suhas.quiz.dto.QuestionResponse;
-import com.suhas.quiz.dto.QuizResultResponse;
-import com.suhas.quiz.dto.SubmitQuizRequest;
+import com.suhas.quiz.dto.*;
 import com.suhas.quiz.model.Question;
 import com.suhas.quiz.repository.QuestionRepository;
 import com.suhas.quiz.service.LeaderboardService;
+import com.suhas.quiz.service.UserAttemptService;
 import com.suhas.quiz.service.impl.QuizSubmissionService;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,15 +18,17 @@ public class UserQuizController {
     private final QuestionRepository questionRepository;
     private final QuizSubmissionService quizSubmissionService;
     private final LeaderboardService leaderboardService;
+    private final UserAttemptService userAttemptService;
 
     public UserQuizController(
             QuestionRepository questionRepository,
             QuizSubmissionService quizSubmissionService,
-            LeaderboardService leaderboardService) {
+            LeaderboardService leaderboardService,UserAttemptService userAttemptService) {
 
         this.questionRepository = questionRepository;
         this.quizSubmissionService = quizSubmissionService;
         this.leaderboardService = leaderboardService;
+        this.userAttemptService=userAttemptService;
     }
 
     @GetMapping("/topics/{topicId}/questions")
@@ -58,7 +58,11 @@ public class UserQuizController {
     @GetMapping("/topics/{topicId}/leaderboard")
     public List<LeaderboardResponse> getLeaderboard(
             @PathVariable Long topicId) {
-
         return leaderboardService.getLeaderboard(topicId);
+    }
+
+    @GetMapping("/attempts")
+    public List<UserAttemptResponse> getUserAttempts() {
+        return userAttemptService.getUserAttempts();
     }
 }
