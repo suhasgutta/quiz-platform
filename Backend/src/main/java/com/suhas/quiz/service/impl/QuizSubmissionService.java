@@ -5,6 +5,7 @@ import com.suhas.quiz.model.*;
 import com.suhas.quiz.repository.*;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import java.util.Optional;
 
 import java.util.*;
 
@@ -28,11 +29,13 @@ public class QuizSubmissionService {
 
     public QuizResultResponse submitQuiz(SubmitQuizRequest request) {
 
-        // 1️⃣ Validate topic
+        // 1️ Validate topic
         Topic topic = topicRepository.findById(request.topicId)
                 .orElseThrow(() -> new RuntimeException("Topic not found"));
 
-        // 2️⃣ Get logged-in user
+
+
+        // 2️ Get logged-in user
         String username = SecurityContextHolder
                 .getContext()
                 .getAuthentication()
@@ -41,11 +44,18 @@ public class QuizSubmissionService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
+        Optional<QuizAttempt> existingAttempt =
+                quizAttemptRepository.findByUserIdAndTopicId(user.getId(), topic.getId());
+
+        if (existingAttempt.isPresent()) {
+            throw new RuntimeException("You have already attempted this quiz");
+        }
+
         if (request.answers == null || request.answers.isEmpty()) {
             throw new RuntimeException("Answers cannot be empty");
         }
 
-        // 3️⃣ Prevent duplicate question submission
+        // 3️ Prevent duplicate question submission
         Set<Long> uniqueQuestionIds = new HashSet<>();
         for (SubmitAnswer ans : request.answers) {
             if (!uniqueQuestionIds.add(ans.questionId)) {
@@ -58,7 +68,7 @@ public class QuizSubmissionService {
         List<AttemptAnswer> attemptAnswers = new ArrayList<>();
         List<AnswerReview> reviews = new ArrayList<>();
 
-        // 4️⃣ Process answers
+        // 4️ Process answers
         for (SubmitAnswer submitted : request.answers) {
 
             Question question = questionRepository.findById(submitted.questionId)
@@ -109,21 +119,21 @@ public class QuizSubmissionService {
         int totalQuestions = request.answers.size();
         double percentage = ((double) score / totalQuestions) * 100;
 
-        // 5️⃣ Create attempt
+        // 5⃣ Create attempt
         QuizAttempt attempt =
                 new QuizAttempt(user, topic, score, totalQuestions, percentage);
 
-        // 6️⃣ Link attempt answers
+        // 6️ Link attempt answers
         for (AttemptAnswer answer : attemptAnswers) {
             answer.setQuizAttempt(attempt);
         }
 
         attempt.setAnswers(attemptAnswers);
 
-        // 7️⃣ Save attempt
+        // 7️ Save attempt
         quizAttemptRepository.save(attempt);
 
-        // 8️⃣ Return result with review
+        // 8️ Return result with review
         return new QuizResultResponse(score, totalQuestions, percentage, reviews);
     }
 }
